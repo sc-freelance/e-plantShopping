@@ -1,49 +1,42 @@
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import ProductList from "./ProductList.jsx";
+import CartItems from "./CartItem.jsx";
+import Landing from "./Landing.jsx"; // make sure Landing.jsx is in src/
 
-import React, { useState } from 'react';
-import ProductList from './ProductList';
-import './App.css';
-import AboutUs from './AboutUs';
+import "./App.css"; // your global styles (also navbar styling)
 
-function App() {
-  
-  const [showProductList, setShowProductList] = useState(false);
+const App = () => {
+  const [page, setPage] = useState("landing"); // start at landing
 
-  const handleGetStartedClick = () => {
-    setShowProductList(true);
-  };
-
-  const handleHomeClick = () => {
-    setShowProductList(false);
-  };
+  // Live cart count from Redux
+  const cartCount = useSelector((state) =>
+    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+  );
 
   return (
-    <div className="app-container">
-      <div className={`landing-page ${showProductList ? 'fade-out' : ''}`}>
-        <div className="background-image"></div>
-        <div className="content">
-         <div className="landing_content">
-         <h1>Welcome To Paradise Nursery</h1>
-          <div className="divider"></div>
-          <p>Where Green Meets Serenity</p>
-         
-          <button className="get-started-button" onClick={handleGetStartedClick}>
-            Get Started
-          </button>
-         </div>
-          <div className="aboutus_container">
-          <AboutUs/>
-          </div>
-          </div>
+    <div>
+      {/* Navbar always visible */}
+      <nav className="navbar">
+        <div className="navbar-brand" onClick={() => setPage("products")}>
+          🌱 Plant Shop
+        </div>
+        <div className="navbar-links">
+          <button onClick={() => setPage("products")}>Shop</button>
+          <button onClick={() => setPage("cart")}>Cart ({cartCount})</button>
+        </div>
+      </nav>
 
-      </div>
-      <div className={`product-list-container ${showProductList ? 'visible' : ''}`}>
-        <ProductList onHomeClick={handleHomeClick}/>
-      </div>
+      {/* Conditional rendering */}
+      {page === "landing" && (
+        <Landing onStartShopping={() => setPage("products")} />
+      )}
+      {page === "products" && <ProductList />}
+      {page === "cart" && (
+        <CartItems onContinueShopping={() => setPage("products")} />
+      )}
     </div>
   );
-}
+};
 
 export default App;
-
-
-
